@@ -84,6 +84,23 @@
           ?>
         </div>
       </fieldset>
+      <fieldset>  
+        <legend><?php echo $lang->bug->root_cause;?></legend>
+        <div class='content'>
+          <?php
+          $tplCause      = strip_tags(trim($lang->bug->tplCause));
+          $root_cause    = str_replace('<p>' . $tplCause, '<p class="stepTitle">' . $tplCause . '</p><p>', $bug->root_cause);
+
+          $tplSolution   = strip_tags(trim($lang->bug->tplSolution));
+          $root_cause    = str_replace('<p>' . $tplSolution, '<p class="stepTitle">' . $tplSolution . '</p><p>', $root_cause);
+
+          $root_cause    = str_replace('<p></p>', '', $root_cause);
+          echo $root_cause;
+          ?>
+        </div>
+      </fieldset>
+
+
       <?php echo $this->fetch('file', 'printFiles', array('files' => $bug->files, 'fieldset' => 'true'));?>
       <?php include '../../common/view/action.html.php';?>
       <div class='actions'><?php if(!$bug->deleted) echo $actionLinks;?></div>

@@ -67,6 +67,11 @@ js::set('productID' , $bug->product);
       <td colspan='2'><?php echo $this->fetch('file', 'buildform', 'fileCount=1&percent=0.85');?></td>
     </tr>
     <tr>
+      <th><?php echo $lang->bug->root_cause;?></th>
+      <td colspan='2'><?php echo html::textarea('root_cause', $lang->bug->tplCause.$lang->bug->tplSolution, "rows='6' class='form-control'");?></td>
+    </tr>
+
+    <tr>
       <th><?php echo $lang->comment;?></th>
       <td colspan='2'><?php echo html::textarea('comment', '', "rows='6' class='form-control'");?></td>
     </tr>

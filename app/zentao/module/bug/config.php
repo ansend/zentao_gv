@@ -6,9 +6,9 @@ $config->bug->longlife    = 7;
 $config->bug->create  = new stdclass();
 $config->bug->edit    = new stdclass();
 $config->bug->resolve = new stdclass();
-$config->bug->create->requiredFields  = 'title,openedBuild,module';
+$config->bug->create->requiredFields  = 'title,openedBuild,module, steps';
 $config->bug->edit->requiredFields    = $config->bug->create->requiredFields;
-$config->bug->resolve->requiredFields = 'resolution';
+$config->bug->resolve->requiredFields = 'resolution,root_cause';
 
 $config->bug->list = new stdclass();
 $config->bug->list->allFields = 'id, module, project, story, task, 
@@ -21,7 +21,8 @@ $config->bug->list->allFields = 'id, module, project, story, task,
     duplicateBug, linkBug, 
     case,
     lastEditedBy,
-    lastEditedDate';
+    lastEditedDate,
+    root_cause';
 
 $config->bug->list->defaultFields = 'id,severity,pri,title,openedBy,assignedTo,resolvedBy,resolution';
 
@@ -31,11 +32,11 @@ $config->bug->list->exportFields = 'id, product, branch, module, project, story,
     openedBy, openedDate, openedBuild, 
     assignedTo, assignedDate,
     resolvedBy, resolution, resolvedBuild, resolvedDate,
-    closedBy, closedDate, 
+    closedBy, closedDate, root_cause,
     duplicateBug, linkBug, 
     case,
     lastEditedBy,
-    lastEditedDate, files';
+    lastEditedDate, files, root_cause';
 
 $config->bug->list->customCreateFields      = 'project,story,task,pri,severity,os,browser,deadline,mailto,keywords';
 $config->bug->list->customBatchCreateFields = 'module,project,steps,type,pri,deadline,severity,os,browser,keywords';
@@ -59,11 +60,11 @@ if($config->global->flow == 'onlyTest')
 
 $config->bug->editor = new stdclass();
 $config->bug->editor->create     = array('id' => 'steps', 'tools' => 'bugTools');
-$config->bug->editor->edit       = array('id' => 'steps,comment', 'tools' => 'bugTools');
+$config->bug->editor->edit       = array('id' => 'steps,root_cause,comment', 'tools' => 'bugTools');
 $config->bug->editor->view       = array('id' => 'comment,lastComment', 'tools' => 'bugTools');
 $config->bug->editor->confirmbug = array('id' => 'comment', 'tools' => 'bugTools');
 $config->bug->editor->assignto   = array('id' => 'comment', 'tools' => 'bugTools');
-$config->bug->editor->resolve    = array('id' => 'comment', 'tools' => 'bugTools');
+$config->bug->editor->resolve    = array('id' => 'root_cause,comment', 'tools' => 'bugTools');
 $config->bug->editor->close      = array('id' => 'comment', 'tools' => 'bugTools');
 $config->bug->editor->activate   = array('id' => 'comment', 'tools' => 'bugTools');
 

@@ -28,6 +28,7 @@ $lang->bug->type             = 'Bug类型';
 $lang->bug->os               = '操作系统';
 $lang->bug->browser          = '浏览器';
 $lang->bug->steps            = '重现步骤';
+$lang->bug->root_cause       = '问题分析';
 $lang->bug->status           = 'Bug状态';
 $lang->bug->statusAB         = '状态';
 $lang->bug->activatedCount   = '激活次数';
@@ -147,6 +148,7 @@ $lang->bug->legendComment               = '备注';
 $lang->bug->legendLife                  = 'BUG的一生';
 $lang->bug->legendMisc                  = '其他相关';
 $lang->bug->legendRelated               = '其他信息';
+$lang->bug->legendRootCause             = '问题分析';
 
 /* 功能按钮。*/
 $lang->bug->buttonConfirm        = '确认';
@@ -164,6 +166,11 @@ $lang->bug->confirmDeleteTemplate = '您确认要删除该模板吗？';
 $lang->bug->tplStep   = "<p>[步骤]</p>";
 $lang->bug->tplResult = "<p>[结果]</p>";
 $lang->bug->tplExpect = "<p>[期望]</p>";
+
+/* 模板。*/
+$lang->bug->tplCause    = "<p>[根本原因]</p>";
+$lang->bug->tplSolution = "<p>[解决方案]</p>";
+
 
 /* 各个字段取值列表。*/
 $lang->bug->severityList[3] = '3';

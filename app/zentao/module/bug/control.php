@@ -326,7 +326,7 @@ class bug extends control
         $type       = 'codeerror';
         $pri        = '';
         $color      = '';
-
+        $root_cause = $this->lang->bug->tplCause . $this->lang->bug->tplSolution; //ansen
         /* Parse the extras. */
         $extras = str_replace(array(',', ' '), array('&', ''), $extras);
         parse_str($extras);
@@ -431,7 +431,7 @@ class bug extends control
         $this->view->branch           = $branch;
         $this->view->branches         = $branches;
         $this->view->color            = $color;
-
+        $this->view->root_cause       = htmlspecialchars($root_cause);
         $this->display();
     }
 

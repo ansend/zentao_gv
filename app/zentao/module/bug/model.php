@@ -839,6 +839,7 @@ class bugModel extends model
             ->add('assignedDate',   $now)
             ->add('lastEditedBy',   $this->app->user->account)
             ->add('lastEditedDate', $now)
+            ->stripTags($this->config->bug->editor->resolve['id'], $this->config->allowedTags)  //ansen
             ->setDefault('resolvedDate', $now)
             ->setDefault('duplicateBug', 0)
             ->setDefault('assignedTo', $oldBug->openedBy)

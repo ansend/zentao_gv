@@ -51,6 +51,15 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
         <legend><?php echo $lang->bug->legendSteps;?></legend>
         <div class='form-group'><?php echo html::textarea('steps', htmlspecialchars($bug->steps), "rows='12' class='form-control'");?></div>
       </fieldset>
+
+    <?php if (strcmp($bug->status,'resolved') == 0):?>
+      <fieldset>
+        <legend><?php echo $lang->bug->legendRootCause;?></legend>
+        <div class='form-group'><?php echo html::textarea('root_cause', htmlspecialchars($bug->root_cause), "rows='12' class='form-control'");?></div>
+      </fieldset>
+
+    <?php endif; ?>
+
       <fieldset>
         <legend><?php echo $lang->bug->legendComment;?></legend>
         <div class='form-group'><?php echo html::textarea('comment', '', "rows='6' class='form-control'");?></div>

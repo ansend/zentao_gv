@@ -232,6 +232,7 @@ js::set('confirmDeleteTemplate', $lang->bug->confirmDeleteTemplate);
           <?php echo html::textarea('steps', $steps, "rows='10' class='form-control'");?>
         </td>
       </tr>
+
       <?php
       $showStory = strpos(",$showFields,", ',story,') !== false;
       $showTask  = strpos(",$showFields,", ',task,')  !== false;
