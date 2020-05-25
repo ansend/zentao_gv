@@ -1,5 +1,5 @@
 *.sql.php
 *.file.zip.php
 *.code.zip.php
-data #ignore all data folder and file
+*/data/ #ignore all data folder and file
 tmp/ #ignore all tmp folder
