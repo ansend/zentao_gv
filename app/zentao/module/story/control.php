@@ -312,6 +312,7 @@ class story extends control
         $estimate = '';
         $title    = '';
         $spec     = '';
+        $storyNum  = '';
 
         /* Process upload images. */
         if($this->session->storyImagesFile)
@@ -369,6 +370,7 @@ class story extends control
         $this->view->estimate         = $estimate;
         $this->view->storyTitle       = $title;
         $this->view->spec             = $spec;
+        $this->view->storyNum         = $storyNum;
         $this->view->branch           = $branch;
         $this->view->branches         = $this->loadModel('branch')->getPairs($productID);
         $this->view->needReview       = ($this->app->user->account == $product->PO || $this->config->story->needReview == 0) ? 0 : 1;
@@ -415,8 +417,15 @@ class story extends control
     public function edit($storyID)
     {
         if(!empty($_POST))
-        {
-            $changes = $this->story->update($storyID);
+	{  
+            $changes = '';
+	    if(empty($_POST['spec']))
+	    {
+		    $changes = $this->story->update($storyID);
+	    }else
+	    {
+		  $changes = $this->story->updatewithspec($storyID);
+	    }
             if(dao::isError()) die(js::error(dao::getError()));
             if($this->post->comment != '' or !empty($changes))
             {

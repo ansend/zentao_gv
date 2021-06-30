@@ -292,6 +292,7 @@ class storyModel extends model
             $story->color      = $stories->color[$i];
             $story->title      = $stories->title[$i];
             $story->source     = $stories->source[$i];
+            $story->storyNum   = $stories->storyNum[$i];
             $story->pri        = $stories->pri[$i];
             $story->estimate   = $stories->estimate[$i];
             $story->status     = ($stories->needReview[$i] == 0 and !$forceReview) ? 'active' : 'draft';
@@ -393,6 +394,8 @@ class storyModel extends model
      */
     public function change($storyID)
     {
+
+	//echo(js::alert($_POST['spec']));
         $specChanged = false;
         $oldStory    = $this->dao->findById((int)$storyID)->from(TABLE_STORY)->fetch();
         $oldSpec     = $this->dao->select('title,spec,verify')->from(TABLE_STORYSPEC)->where('story')->eq((int)$storyID)->andWhere('version')->eq($oldStory->version)->fetch();
@@ -415,6 +418,7 @@ class storyModel extends model
         $story = fixer::input('post')->stripTags($this->config->story->editor->change['id'], $this->config->allowedTags)->get();
         if($story->spec != $oldStory->spec or $story->verify != $oldStory->verify or $story->title != $oldStory->title or $this->loadModel('file')->getCount()) $specChanged = true;
 
+	//echo(js::alert($story->spec));
         $now   = helper::now();
         $story = fixer::input('post')
             ->callFunc('title', 'trim')
@@ -438,7 +442,9 @@ class storyModel extends model
             ->autoCheck()
             ->batchCheck($this->config->story->change->requiredFields, 'notempty')
             ->where('id')->eq((int)$storyID)->exec();
-        if(!dao::isError())
+	
+	//echo(js::alert($story->spec));
+	if(!dao::isError())
         {
             if($specChanged)
             {
@@ -461,6 +467,110 @@ class storyModel extends model
     }
 
     /**
+     * Update a story with spec and verify info, add by ansen for story update with spec and verify info in draft status.
+     *
+     * @param  int    $storyID
+     * @access public
+     * @return array the changes of the story.
+     */
+    public function updatewithspec($storyID)
+    {
+	    
+	//echo(js::alert($_POST['spec']));
+	
+	$specChanged = false;
+
+        $now      = helper::now();
+        $oldStory = $this->dao->select('*')->from(TABLE_STORY)->where('id')->eq($storyID)->fetch();
+        $oldSpec     = $this->dao->select('title,spec,verify')->from(TABLE_STORYSPEC)->where('story')->eq((int)$storyID)->andWhere('version')->eq($oldStory->version)->fetch();
+
+	if(!empty($_POST['lastEditedDate']) and $oldStory->lastEditedDate != $this->post->lastEditedDate)
+        {
+            dao::$errors[] = $this->lang->error->editedByOther;
+            return false;
+	}
+        $story_te = fixer::input('post')->stripTags($this->config->story->editor->edit['id'], $this->config->allowedTags)->get();
+       
+	//echo(js::alert($story_te->spec));
+	if($story_te->spec != $oldStory->spec or $story_te->verify != $oldStory->verify or $story_te->title != $oldStory->title or $this->loadModel('file')->getCount()) $specChanged = true; 
+
+	//echo(js::alert($specChanged));
+
+        $story = fixer::input('post')
+            ->cleanInt('product,module,pri')
+            ->add('assignedDate', $oldStory->assignedDate)
+            ->add('lastEditedBy', $this->app->user->account)
+            ->add('lastEditedDate', $now)
+            ->setDefault('status', $oldStory->status)
+            ->setDefault('product', $oldStory->product)
+            ->setDefault('branch', $oldStory->branch)
+            ->setIF($this->post->assignedTo   != $oldStory->assignedTo, 'assignedDate', $now)
+            ->setIF($this->post->closedBy     != false and $oldStory->closedDate == '', 'closedDate', $now)
+            ->setIF($this->post->closedReason != false and $oldStory->closedDate == '', 'closedDate', $now)
+            ->setIF($this->post->closedBy     != false or  $this->post->closedReason != false, 'status', 'closed')
+            ->setIF($this->post->closedReason != false and $this->post->closedBy     == false, 'closedBy', $this->app->user->account)
+            ->join('reviewedBy', ',')
+            ->join('mailto', ',')
+            ->stripTags($this->config->story->editor->create['id'], $this->config->allowedTags)
+            ->remove('linkStories,childStories,files,labels,comment')
+	    ->get();
+
+        if(isset($story->plan) and is_array($story->plan)) $story->plan = trim(join(',', $story->plan), ',');
+        if(empty($_POST['product'])) $story->branch = $oldStory->branch;
+        if(empty($_POST['branch']))  $story->branch = 0;
+	
+        $story = $this->loadModel('file')->processImgURL($story, $this->config->story->editor->edit['id'], $this->post->uid);
+	//echo(js::alert($story->spec));
+
+        $this->dao->update(TABLE_STORY)
+           ->data($story, 'spec,verify')
+           ->autoCheck()
+           ->checkIF(isset($story->closedBy), 'closedReason', 'notempty')
+           ->checkIF(isset($story->closedReason) and $story->closedReason == 'done', 'stage', 'notempty')
+           ->checkIF(isset($story->closedReason) and $story->closedReason == 'duplicate',  'duplicateStory', 'notempty')
+           ->where('id')->eq((int)$storyID)->exec();
+	
+	//echo(js::alert("hellow"));
+        if(!dao::isError())
+	{
+	    //echo(js::alert("spec change"));
+            if($specChanged)
+            {
+                $data          = new stdclass();
+                //$data->story   = $storyID;
+                //$data->version = $oldStory->version;
+                //$data->title   = $story->title;
+                //$data->spec    = $story_te->spec;
+                //$data->verify  = $story_te->verify;
+                $data->spec    = $story->spec;
+                $data->verify  = $story->verify;
+                $this->dao->update(TABLE_STORYSPEC)->data($data)->where('story')->eq($storyID)->andWhere('version')->eq($oldStory->version)->exec();
+            }
+
+        }
+
+        if(!dao::isError())
+        {
+            if($story->product != $oldStory->product)
+            {
+                $this->dao->update(TABLE_PROJECTSTORY)->set('product')->eq($story->product)->where('story')->eq($storyID)->exec();
+                $storyProjects  = $this->dao->select('project')->from(TABLE_PROJECTSTORY)->where('story')->eq($storyID)->orderBy('project')->fetchPairs('project', 'project');
+                $linkedProjects = $this->dao->select('project')->from(TABLE_PROJECTPRODUCT)->where('project')->in($storyProjects)->andWhere('product')->eq($story->product)->orderBy('project')->fetchPairs('project','project');
+                $unlinkedProjects = array_diff($storyProjects, $linkedProjects);
+                foreach($unlinkedProjects as $projectID)
+                {
+                    $data = new stdclass();
+                    $data->project = $projectID;
+                    $data->product = $story->product;
+                    $this->dao->replace(TABLE_PROJECTPRODUCT)->data($data)->exec();
+                }
+            }
+            if(isset($story->closedReason) and $story->closedReason == 'done') $this->loadModel('score')->create('story', 'close');
+            return common::createChanges($oldStory, $story);
+        }
+    }
+
+    /**
      * Update a story.
      *
      * @param  int    $storyID
@@ -475,7 +585,7 @@ class storyModel extends model
         {
             dao::$errors[] = $this->lang->error->editedByOther;
             return false;
-        }
+	}
 
         $story = fixer::input('post')
             ->cleanInt('product,module,pri')
@@ -526,6 +636,8 @@ class storyModel extends model
             return common::createChanges($oldStory, $story);
         }
     }
+
+
 
     /**
      * Batch update stories.
@@ -2387,6 +2499,9 @@ class storyModel extends model
                 break;
             case 'sourceNote':
                 echo $story->sourceNote;
+                break;
+            case 'storyNum':
+                echo $story->storyNum;
                 break;
             case 'status':
                 echo $this->lang->story->statusList[$story->status];

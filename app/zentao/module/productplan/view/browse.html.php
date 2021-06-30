@@ -52,8 +52,10 @@
     <th class='w-100px'><?php common::printOrderLink('end',   $orderBy, $vars, $lang->productplan->end);?></th>
     <th class='w-60px'> <?php echo $lang->productplan->stories;?></th>
     <th class='w-60px'> <?php echo $lang->productplan->bugs;?></th>
+    <?php if($this->config->global->flow != 'onlyTest'):?>
     <th class='w-60px'> <?php echo $lang->productplan->hour;?></th>
     <th class='w-60px'> <?php echo $lang->productplan->project;?></th>
+    <?php endif;?>
     <th class='w-p20'>  <?php echo $lang->productplan->desc;?></th>
     <th class="w-130px {sorter: false}"><?php echo $lang->actions;?></th>
   </tr>
@@ -75,12 +77,17 @@
     <td><?php echo $plan->end == '2030-01-01' ? $lang->productplan->future : $plan->end;?></td>
     <td class='text-center'><?php echo $plan->stories;?></td>
     <td class='text-center'><?php echo $plan->bugs;?></td>
+    <?php if($this->config->global->flow != 'onlyTest'):?>
     <td class='text-center'><?php echo $plan->hour;?></td>
     <td class='text-center'><?php if(!empty($plan->projectID)) echo html::a(helper::createLink('project', 'task', 'projectID=' . $plan->projectID), '<i class="icon-search"></i>');?></td>
+    <?php endif;?>
+
     <td class='text-left content'><div class='article-content'><?php echo $plan->desc;?></div></td>
     <td class='text-center'>
-      <?php
-      if(common::hasPriv('project', 'create')) echo html::a(helper::createLink('project', 'create', "projectID=&copyProjectID=&planID=$plan->id"), '<i class="icon-play"></i>', '', "class='btn-icon' title='{$lang->project->create}'");
+<?php
+      if($this->config->global->flow != 'onlyTest') { 
+	      if(common::hasPriv('project', 'create')) echo html::a(helper::createLink('project', 'create', "projectID=&copyProjectID=&planID=$plan->id"), '<i class="icon-play"></i>', '', "class='btn-icon' title='{$lang->project->create}'");
+      }
       if(common::hasPriv('productplan', 'linkStory')) echo html::a(inlink('view', "planID=$plan->id&type=story&orderBy=id_desc&link=true"), '<i class="icon-link"></i>', '', "class='btn-icon' title='{$lang->productplan->linkStory}'");
       if(common::hasPriv('productplan', 'linkBug') and $config->global->flow != 'onlyStory') echo html::a(inlink('view', "planID=$plan->id&type=bug&orderBy=id_desc&link=true"), '<i class="icon-bug"></i>', '', "class='btn-icon' title='{$lang->productplan->linkBug}'");
       common::printIcon('productplan', 'edit', "planID=$plan->id", $plan, 'list');

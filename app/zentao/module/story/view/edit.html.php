@@ -31,6 +31,7 @@
           <?php echo html::input('title', $story->title, 'class="form-control disabled" disabled="disabled" autocomplete="off"');?>
         </div>
       </div>
+      <?php if($story->status != 'draft'):?>
       <fieldset>
         <legend><?php echo $lang->story->legendSpec;?></legend>
         <div class='article-content'><?php echo $story->spec;?></div>
@@ -39,6 +40,23 @@
         <legend><?php echo $lang->story->verify;?></legend>
         <div class='article-content'><?php echo $story->verify;?></div>
       </fieldset>
+      <?php else:?>
+      <fieldset class='fieldset-pure'>
+        <legend><?php echo $lang->story->legendSpec;?></legend>
+        <div class='form-group'>
+	<?php echo html::textarea('spec', htmlspecialchars($story->spec), "rows='8' class='form-control'");?>
+        <span class='help-block'><?php echo $lang->story->specTemplate;?></span>
+        </div>
+      </fieldset>
+      
+      <fieldset class='fieldset-pure'>
+        <legend><?php echo $lang->story->verify;?></legend>
+        <div class='form-group'>
+	<?php echo html::textarea('verify', htmlspecialchars($story->verify), "rows='6' class='form-control'");?>
+        </div>
+      </fieldset>
+
+      <?php endif;?>
       <fieldset class='fieldset-pure'>
         <legend><?php echo $lang->story->comment;?></legend>
         <div class='form-group'>
@@ -109,14 +127,19 @@
           <tr>
             <th><?php echo $lang->story->source;?></th>
             <td><?php echo html::select('source', $lang->story->sourceList, $story->source, "class='form-control chosen'");?></td>
-          </tr>
+	  </tr>
+          <tr>
+            <th><?php echo $lang->story->storyNum;?></th>
+            <td><?php echo html::input('storyNum', $story->storyNum, "class='form-control' autocomplete='off'");?>
+          </td>
+ 
           <tr>
             <th><?php echo $lang->story->sourceNote;?></th>
             <td><?php echo html::input('sourceNote', $story->sourceNote, "class='form-control' autocomplete='off'");?>
           </td>
           </tr>
           <tr>
-            <th><?php echo $lang->story->status;?></th>
+            <th><?php echo $lang->story->status;?>  </th>
             <td><span class='story-<?php echo $story->status;?>'><?php echo $lang->story->statusList[$story->status];?></span></td>
           </tr>
           <?php if($story->status != 'draft'):?>

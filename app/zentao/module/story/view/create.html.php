@@ -90,6 +90,10 @@
         </td>
       </tr> 
       <tr>
+        <th><?php echo $lang->story->storyNum;?></th>
+        <td colspan='2'><?php echo html::textarea('storyNum', $storyNum, " rows='2' class='form-control'");?></td>
+      </tr>
+      <tr>
         <th><?php echo $lang->story->title;?></th>
         <td colspan='2'>
           <div class='row-table'>

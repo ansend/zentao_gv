@@ -21,7 +21,7 @@ $config->story->review->requiredFields = 'assignedTo,reviewedBy';
 $config->story->editor = new stdclass();
 $config->story->editor->create   = array('id' => 'spec,verify', 'tools' => 'simpleTools');
 $config->story->editor->change   = array('id' => 'spec,verify,comment', 'tools' => 'simpleTools');
-$config->story->editor->edit     = array('id' => 'comment', 'tools' => 'simpleTools');
+$config->story->editor->edit     = array('id' => 'spec,verify,comment', 'tools' => 'simpleTools');
 $config->story->editor->view     = array('id' => 'comment,lastComment', 'tools' => 'simpleTools');
 $config->story->editor->close    = array('id' => 'comment', 'tools' => 'simpleTools');
 $config->story->editor->review   = array('id' => 'comment', 'tools' => 'simpleTools');
@@ -29,7 +29,7 @@ $config->story->editor->activate = array('id' => 'comment', 'tools' => 'simpleTo
 
 $config->story->list = new stdclass();
 $config->story->list->exportFields      = '
-    id, product, branch, module, plan, source, sourceNote, title, spec, verify, keywords,
+    id, product, branch, module, plan, source, sourceNote, storyNum,title, spec, verify, keywords,
     pri, estimate, status, stage, taskCountAB, bugCountAB, caseCountAB,
     openedBy, openedDate, assignedTo, assignedDate, mailto,
     reviewedBy, reviewedDate,
@@ -43,7 +43,7 @@ $config->story->list->customCreateFields      = 'source,verify,pri,mailto,keywor
 
 //$config->story->list->customBatchCreateFields = 'plan,spec,source,verify,pri,estimate,review,keywords';
 //ansen custom batch create story field
-$config->story->list->customBatchCreateFields = 'plan,spec,source,verify,pri,review,keywords';
+$config->story->list->customBatchCreateFields = 'plan,storyNum,spec,source,verify,pri,review,keywords';
 
 //$config->story->list->customBatchEditFields   = 'branch,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
 //ansen custom batch edit story field
@@ -54,14 +54,14 @@ $config->story->custom->createFields      = $config->story->list->customCreateFi
 
 //$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
 // ansen modify
-$config->story->custom->batchCreateFields = 'module,plan,spec,pri,review';
+$config->story->custom->batchCreateFields = 'module,storyNum,plan,spec,pri,review';
 
 //$config->story->custom->batchEditFields   = 'branch,module,plan,estimate,pri,source,stage,closedBy,closedReason';
 //ansen modify
 $config->story->custom->batchEditFields   = 'branch,module,plan,pri,source,stage,closedBy,closedReason';
 
 $config->story->datatable = new stdclass();
-$config->story->datatable->defaultField = array('id', 'pri', 'title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'actions');
+$config->story->datatable->defaultField = array('id', 'pri', 'storyNum','title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'actions');
 
 $config->story->datatable->fieldList['id']['title']    = 'idAB';
 $config->story->datatable->fieldList['id']['fixed']    = 'left';
@@ -73,10 +73,18 @@ $config->story->datatable->fieldList['pri']['fixed']    = 'left';
 $config->story->datatable->fieldList['pri']['width']    = '40';
 $config->story->datatable->fieldList['pri']['required'] = 'no';
 
+$config->story->datatable->fieldList['storyNum']['title']    = 'storyNum';
+$config->story->datatable->fieldList['storyNum']['fixed']    = 'left';
+$config->story->datatable->fieldList['storyNum']['width']    = 'auto';
+$config->story->datatable->fieldList['storyNum']['required'] = 'yes';
+
+
 $config->story->datatable->fieldList['title']['title']    = 'title';
 $config->story->datatable->fieldList['title']['fixed']    = 'left';
 $config->story->datatable->fieldList['title']['width']    = 'auto';
 $config->story->datatable->fieldList['title']['required'] = 'yes';
+
+
 
 $config->story->datatable->fieldList['branch']['title']    = 'branch';
 $config->story->datatable->fieldList['branch']['fixed']    = 'no';

@@ -785,7 +785,8 @@ if(isset($config->global->flow) and $config->global->flow == 'onlyTest')
     unset($lang->product->menu->project);
     unset($lang->product->menu->release);
     unset($lang->product->menu->dynamic);
-    unset($lang->product->menu->plan);
+    // anse debug for onlyTest mode , don't disable plan view.
+    //unset($lang->product->menu->plan);
     unset($lang->product->menu->roadmap);
     unset($lang->product->menu->doc);
     unset($lang->product->menu->module);

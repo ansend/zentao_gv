@@ -41,8 +41,7 @@ foreach(explode(',', $this->config->story->create->requiredFields) as $field)
         if(strpos(",{$config->story->list->customBatchCreateFields},", ",{$field},") !== false) $visibleFields[$field] = '';
     }
 }
-if($this->story->checkForceReview()) unset($visibleFields['review']);
-unset($visibleFields['module']);
+if($this->story->checkForceReview()) unset($visibleFields['review']); unset($visibleFields['module']);
 ?>
 <form class='form-condensed' method='post' enctype='multipart/form-data' target='hiddenwin'>
   <table class='table table-form table-fixed with-border'> 
@@ -55,11 +54,18 @@ unset($visibleFields['module']);
           <?php echo $lang->story->plan;?>
           <?php if(isset($requiredFields['plan'])) echo " <span class='required'></span>";?>
         </th>
-        <th <?php if(count($visibleFields) >= 9) echo "class='w-200px'"?>><?php echo $lang->story->title;?> <span class='required'></span></th>
+	<th <?php if(count($visibleFields) >= 9) echo "class='w-200px'"?>><?php echo $lang->story->title;?> <span class='required'></span></th>
+ 
         <th class='w-p13<?php echo zget($visibleFields, 'spec', ' hidden')?>'>
           <?php echo $lang->story->spec;?>
           <?php if(isset($requiredFields['spec'])) echo " <span class='required'></span>";?>
+	</th>
+
+	<th class='w-160px<?php echo zget($visibleFields, 'storyNum', ' hidden')?>'>
+          <?php echo $lang->story->storyNum;?>
+          <?php if(isset($requiredFields['storyNum'])) echo " <span class='required'></span>";?>
         </th>
+
         <th class='w-80px<?php echo zget($visibleFields, 'source', ' hidden')?>'>
           <?php echo $lang->story->source;?>
           <?php if(isset($requiredFields['source'])) echo " <span class='required'></span>";?>
@@ -105,6 +111,7 @@ unset($visibleFields['module']);
         </div>
       </td>
       <td class='<?php echo zget($visibleFields, 'spec', 'hidden')?>'><?php echo html::textarea("spec[$i]", $spec, "rows='1' class='form-control autosize'");?></td>
+      <td class='<?php echo zget($visibleFields, 'storyNum', 'hidden')?>'><?php echo html::textarea("storyNum[$i]", $storyNum, "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden')?>'><?php echo html::select("source[$i]", $sourceList, $source, "class='form-control'");?></td>
       <td class='<?php echo zget($visibleFields, 'verify', 'hidden')?>'><?php echo html::textarea("verify[$i]", '', "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden')?>' style='overflow:visible'><?php echo html::select("pri[$i]", $priList, $pri, "class='form-control'");?></td>
@@ -137,6 +144,7 @@ unset($visibleFields['module']);
         </div>
       </td>
       <td class='<?php echo zget($visibleFields, 'spec', 'hidden')?>'><?php echo html::textarea("spec[$i]", $spec, "rows='1' class='form-control autosize'");?></td>
+      <td class='<?php echo zget($visibleFields, 'storyNum', 'hidden')?>'><?php echo html::textarea("storyNum[$i]", $storyNum, "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden')?>'><?php echo html::select("source[$i]", $sourceList, $source, "class='form-control'");?></td>
       <td class='<?php echo zget($visibleFields, 'verify', 'hidden')?>'><?php echo html::textarea("verify[$i]", '', "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden')?>' style='overflow:visible'><?php echo html::select("pri[$i]", $priList, $pri, "class='form-control'");?></td>
@@ -165,6 +173,7 @@ unset($visibleFields['module']);
         </div>
       </td>
       <td class='<?php echo zget($visibleFields, 'spec', ' hidden')?>'><?php echo html::textarea("spec[%s]", $spec, "rows='1' class='form-control autosize'");?></td>
+      <td class='<?php echo zget($visibleFields, 'storyNum', ' hidden')?>'><?php echo html::textarea("storyNum[%s]", $storyNum, "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden')?>'><?php echo html::select("source[%s]", $sourceList, $source, "class='form-control'");?></td>
       <td class='<?php echo zget($visibleFields, 'verify', ' hidden')?>'><?php echo html::textarea("verify[%s]", '', "rows='1' class='form-control autosize'");?></td>
       <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden')?>' style='overflow:visible'><?php echo html::select("pri[%s]", $priList, $pri, "class='form-control'");?></td>
