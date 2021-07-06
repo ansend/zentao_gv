@@ -35,7 +35,7 @@ $config->story->list->exportFields      = '
     reviewedBy, reviewedDate,
     closedBy, closedDate, closedReason,
     lastEditedBy, lastEditedDate,
-    childStories, linkStories, duplicateStory, files';
+    childStories, linkStories, duplicateStory, files, version';
 
 //$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
 //ansen custom create story field
