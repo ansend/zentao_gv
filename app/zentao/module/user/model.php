@@ -612,6 +612,7 @@ class userModel extends model
     {
         if(!$account or !$password) return false;
 
+            //echo(js::alert("start to found database")); 
         /* Get the user first. If $password length is 32, don't add the password condition.  */
         $record = $this->dao->select('*')->from(TABLE_USER)
             ->where('account')->eq($account)
@@ -623,13 +624,22 @@ class userModel extends model
         $user = false;
         if($record)
         {
+            //echo(js::alert("found a record")); 
             $passwordLength = strlen($password);
             if($passwordLength < 32)
             {
                 $user = $record;
             }
             elseif($passwordLength == 32)
-            {
+	    {
+		
+		    //echo(js::alert($this->session->rand)); 
+		    //ansen: after the user logout in the web page. 
+		    //the next autologin maybe failed. since here 
+		    //the session->rand is not null, so the $password 
+		    //be md5($record->password . $this->session->rand), instead of password record.
+		    //we may add another login here to bypass this problem.
+		    //the password == record->password || password == md5($record->password . $this->session->rand)
                 $hash = $this->session->rand ? md5($record->password . $this->session->rand) : $record->password;
                 $user = $password == $hash ? $record : '';
             }
@@ -639,10 +649,11 @@ class userModel extends model
                 $user = $password == $hash ? $record : '';
             }
             if(!$user and md5($password) == $record->password) $user = $record;
-        }
-
+	}
         if($user)
-        {
+	{
+
+            //echo(js::alert("found user")); 
             $ip   = $this->server->remote_addr;
             $last = $this->server->request_time;
 
@@ -662,6 +673,10 @@ class userModel extends model
             /* Create cycle todo in login. */
             $todoList = $this->dao->select('*')->from(TABLE_TODO)->where('cycle')->eq(1)->andWhere('account')->eq($user->account)->fetchAll('id');
             $this->loadModel('todo')->createByCycle($todoList);
+	}
+	if($user)
+	{
+            //echo(js::alert("found user in identify")); 
         }
         return $user;
     }

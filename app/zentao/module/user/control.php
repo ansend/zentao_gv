@@ -664,7 +664,7 @@ class user extends control
             if($this->app->getViewType() == 'json')
             {
                 $data = $this->user->getDataInJSON($this->app->user);
-                die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
+		die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
             }
 
             if(strpos($this->referer, $loginLink) === false and 
@@ -683,7 +683,8 @@ class user extends control
         if(!empty($_POST) or (isset($_GET['account']) and isset($_GET['password'])))
         {
             $account  = '';
-            $password = '';
+	    $password = '';
+	    //echo(js::alert($this->get->password));
             if($this->post->account)  $account  = $this->post->account;
             if($this->get->account)   $account  = $this->get->account;
             if($this->post->password) $password = $this->post->password;
@@ -696,10 +697,13 @@ class user extends control
                 die(js::error($failReason));
             }
 
+	    //echo(js::alert($account));
+	    //echo(js::alert($password));
             $user = $this->user->identify($account, $password);
 
             if($user)
             {
+	        //echo(js::alert("use check passed"));
                 $this->user->cleanLocked($account);
                 /* Authorize him and save to session. */
                 $user->rights = $this->user->authorize($account);
@@ -716,8 +720,8 @@ class user extends control
                 {
                     if($this->app->getViewType() == 'json')
                     {
-                        $data = $this->user->getDataInJSON($user);
-                        die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
+			    $data = $this->user->getDataInJSON($user);
+			    die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
                     }
 
                     /* Get the module and method of the referer. */
@@ -795,6 +799,213 @@ class user extends control
             $this->display();
         }
     }
+
+
+    /**
+     * User login, identify him and authorize him.
+     *
+     * @param string $referer
+     * @param string $from
+     *
+     * @access public
+     * @return void
+     */
+    public function plmlogin($referer = '', $from = '')
+    {
+        //echo(js::alert("use check passed"));
+        //echo(js::alert($_GET['account']));
+	//echo(js::alert($_GET['productcode']));
+	$default_product_code = '0';
+	if(isset($_GET['productcode']))
+        {
+           $default_product_code = $_GET['productcode'];
+	}
+        if($this->user->checkTmp() === false)
+        {
+            echo "<html><head><meta charset='utf-8'></head>";
+            echo "<body><table align='center' style='width:700px; margin-top:100px; border:1px solid gray; font-size:14px;'><tr><td style='padding:8px'>";
+            echo "<div style='margin-bottom:8px;'>不能创建临时目录，请确认目录<strong style='color:#ed980f'>{$this->app->tmpRoot}</strong>是否存在并有操作权限。</div>";
+            echo "<div>Can't create tmp directory, make sure the directory <strong style='color:#ed980f'>{$this->app->tmpRoot}</strong> exists and has permission to operate.</div>";
+            die("</td></tr></table></body></html>");
+        }
+        $this->setReferer($referer);
+
+        $loginLink = $this->createLink('user', 'login');
+        $denyLink  = $this->createLink('user', 'deny');
+
+        /* Reload lang by lang of get when viewType is json. */
+        if($this->app->getViewType() == 'json' and $this->get->lang and $this->get->lang != $this->app->getClientLang())
+        {
+            $this->app->setClientLang($this->get->lang);
+            $this->app->loadLang('user');
+        }
+
+        /* If user is logon, back to the rerferer. */
+        if($this->user->isLogon())
+	{
+
+            if($this->app->getViewType() == 'json')
+            {
+                $data = $this->user->getDataInJSON($this->app->user);
+		//die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
+		//ansen redirect to bug browse after login.
+                //echo(js::alert("user has been logon"));
+		//die(js::locate($this->createLink('bug', 'browse', "productID=20", "html")));
+                //echo(js::alert("productID=" . $default_product_code));
+		die(js::locate($this->createLink('bug', 'browse', "productID=" . $default_product_code, "html")));
+            }
+
+            if(strpos($this->referer, $loginLink) === false and 
+               strpos($this->referer, $denyLink)  === false and $this->referer
+            )
+            {
+                die(js::locate($this->referer, 'parent'));
+            }
+            else
+            {
+                die(js::locate($this->createLink($this->config->default->module), 'parent'));
+            }
+        }
+
+        //die(js::locate($this->createLink('bug', 'browse', "productID=20", "html")));
+        /* Passed account and password by post or get. */
+        if(!empty($_POST) or (isset($_GET['account']) and isset($_GET['password'])))
+        {
+	    //echo(js::alert("use check passed"));
+            //$this->locate($this->createLink('bug', 'browse', "productID=20", "html"));
+            //die(js::locate($this->createLink('bug', 'browse', "productID=20", "html")));
+            $account  = '';
+	    $password = '';
+	    //echo(js::alert($this->get->password));
+            if($this->post->account)  $account  = $this->post->account;
+            if($this->get->account)   $account  = $this->get->account;
+            if($this->post->password) $password = $this->post->password;
+            if($this->get->password)  $password = $this->get->password;
+
+	    //echo(js::alert($password));
+            if($this->user->checkLocked($account))
+            {
+                $failReason = sprintf($this->lang->user->loginLocked, $this->config->user->lockMinutes);
+                if($this->app->getViewType() == 'json') die(helper::removeUTF8Bom(json_encode(array('status' => 'failed', 'reason' => $failReason))));
+                die(js::error($failReason));
+            }
+
+	    //echo(js::alert($account));
+	    //echo(js::alert($password));
+            $user = $this->user->identify($account, $password);
+
+            if($user)
+	    {
+
+	        //echo(js::alert("find a user"));
+                $this->user->cleanLocked($account);
+                /* Authorize him and save to session. */
+                $user->rights = $this->user->authorize($account);
+                $user->groups = $this->user->getGroups($account);
+                $this->session->set('user', $user);
+                $this->app->user = $this->session->user;
+                $this->loadModel('action')->create('user', $user->id, 'login');
+                $this->loadModel('score')->create('user', 'login');
+                /* Keep login. */
+                if($this->post->keepLogin) $this->user->keepLogin($user);
+
+                /* Go to the referer. */
+                if($this->post->referer and strpos($this->post->referer, $loginLink) === false and strpos($this->post->referer, $denyLink) === false)
+                {
+                    if($this->app->getViewType() == 'json')
+                    {
+	                //echo(js::alert("find a user and view is json"));
+                        $data = $this->user->getDataInJSON($user);
+			//die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
+			//ansen redirect to bug browse after login.
+		        //die(js::locate($this->createLink('bug', 'browse', "productID=20", "html")));
+			//$this->locate($this->createLink('bug', 'browse', "productID=20", "html"));
+		        die(js::locate($this->createLink('bug', 'browse', "productID=" . $default_product_code, "html")));
+                    }
+
+                    /* Get the module and method of the referer. */
+                    if($this->config->requestType == 'PATH_INFO')
+                    {
+                        $path = substr($this->post->referer, strrpos($this->post->referer, '/') + 1);
+                        $path = rtrim($path, '.html');
+                        if(empty($path)) $path = $this->config->requestFix;
+                        list($module, $method) = explode($this->config->requestFix, $path);
+                    }
+                    else
+                    {
+                        $url   = html_entity_decode($this->post->referer);
+                        $param = substr($url, strrpos($url, '?') + 1);
+
+                        $module = $this->config->default->module;
+                        $method = $this->config->default->method;
+                        if(strpos($param, '&') !== false) list($module, $method) = explode('&', $param);
+                        $module = str_replace('m=', '', $module);
+                        $method = str_replace('f=', '', $method);
+                    }
+
+                    if(common::hasPriv($module, $method))
+                    {
+                        die(js::locate($this->post->referer, 'parent'));
+                    }
+                    else
+                    {
+                        die(js::locate($this->createLink($this->config->default->module), 'parent'));
+                    }
+                }
+                else
+                {
+                    if($this->app->getViewType() == 'json')
+                    {
+	                //echo(js::alert("find a user, there is no refer and view type is json"));
+                        $data = $this->user->getDataInJSON($user);
+			//ansen redirect to bug browse after login.
+                        //die(helper::removeUTF8Bom(json_encode(array('status' => 'success') + $data)));
+			//$this->locate($this->createLink('bug', 'browse', "productID=20", "html"));
+		        //die(js::locate($this->createLink('bug', 'browse', "productID=20", "html")));
+		        die(js::locate($this->createLink('bug', 'browse', "productID=" . $default_product_code, "html")));
+                    }
+                    die(js::locate($this->createLink($this->config->default->module), 'parent'));
+                }
+            }
+            else
+            {
+                $fails = $this->user->failPlus($account);
+                if($this->app->getViewType() == 'json') die(helper::removeUTF8Bom(json_encode(array('status' => 'failed', 'reason' => $this->lang->user->loginFailed))));
+                $remainTimes = $this->config->user->failTimes - $fails;
+                if($remainTimes <= 0)
+                {
+                    die(js::error(sprintf($this->lang->user->loginLocked, $this->config->user->lockMinutes)));
+                }
+                else if($remainTimes <= 3)
+                {
+                    die(js::error(sprintf($this->lang->user->lockWarning, $remainTimes)));
+                }
+                die(js::error($this->lang->user->loginFailed));
+            }
+        }
+        else
+        {
+	    //echo(js::alert("use check passed"));
+            if(!empty($this->config->global->showDemoUsers))
+            {
+                $demoUsers = 'productManager,projectManager,dev1,dev2,dev3,tester1,tester2,tester3,testManager';
+                if($this->app->getClientLang() == 'en') $demoUsers = 'thePO,pm1,pm2,pg1,pg2,pg3,thePM,qa1,theQS';
+                $demoUsers = $this->dao->select('account,password,realname')->from(TABLE_USER)->where('account')->in($demoUsers)->andWhere('deleted')->eq(0)->fetchAll('account');
+                $this->view->demoUsers = $demoUsers;
+            }
+
+            $this->app->loadLang('misc');
+            $this->view->noGDLib   = sprintf($this->lang->misc->noGDLib, common::getSysURL() . $this->config->webRoot);
+            $this->view->title     = $this->lang->user->login;
+            $this->view->referer   = $this->referer;
+            $this->view->s         = zget($this->config->global, 'sn', '');
+            $this->view->keepLogin = $this->cookie->keepLogin ? $this->cookie->keepLogin : 'off';
+            $this->view->rand      = $this->user->updateSessionRandom();
+            $this->display();
+        }
+    }
+
+
 
     /**
      * Deny page.

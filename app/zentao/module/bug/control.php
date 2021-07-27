@@ -71,10 +71,41 @@ class bug extends control
         $this->loadModel('datatable');
 
         /* Set browse type. */
-        $browseType = strtolower($browseType);
+	$browseType = strtolower($browseType);
+        
+	//ansen check the productid and judge if it's from plm or not. 
+	//if from plm, the $productID is product code and it should be 
+	//change to zentao product_id.
+	if(is_numeric($productID)){
+            //echo(js::alert("from local"));
+            //do nothing.
+	}else{
+            //echo(js::alert("from plm"));
+	    $products_id = $this->product->getIDbyCode($productID);
+		//if(!empty($products_id)){
+                    //echo(js::alert(var_dump($products_id)));
+                    //$po = $products_id[0];
+                    //echo(js::alert($products_id->id));
+                    if($products_id){
+                       //echo(js::alert($products_id->id));
+             	       if(is_numeric($products_id->id)){
+		          //echo(js::alert("products found id is number"));
+		 	  $productID = $products_id->id;
+		       }else{
+			  // echo(js::alert("products found id is string"));
+			  $productID = (int)$products_id->id;
+		       }
+		    }else{
+                      // echo(js::alert("no found product code"));
+		    }
+                //}
+	}
+        //end of ansen check if from plm system.
 
-        /* Set productID, moduleID, queryID and branch. */
+	/* Set productID, moduleID, queryID and branch. */
+	//echo(js::alert($productID));
         $productID = $this->product->saveState($productID, $this->products);
+	//echo(js::alert($productID));
         $branch    = ($branch == '') ? (int)$this->cookie->preBranch  : (int)$branch;
         setcookie('preProductID', $productID, $this->config->cookieLife, $this->config->webRoot);
         setcookie('preBranch', (int)$branch, $this->config->cookieLife, $this->config->webRoot);
@@ -1641,7 +1672,17 @@ class bug extends control
     {
         $bug = $this->dao->select('*')->from(TABLE_BUG)->where('id')->eq($bugID)->fetch();
         $realname = $this->dao->select('*')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('realname');
-        $bug->assignedTo = $realname ? $realname : ($bug->assignedTo == 'closed' ? 'Closed' : $bug->assignedTo);
-        die(json_encode($bug));
+	$bug->assignedTo = $realname ? $realname : ($bug->assignedTo == 'closed' ? 'Closed' : $bug->assignedTo);
+	header('Content-type: application/json');
+	
+	$post_data = fixer::input('post');
+	$post_data = file_get_contents('php://input');
+	$tmp_obj = json_decode($post_data);
+	$tmp_obj->taskID = "103";
+        //die($post_data);
+        die(json_encode($tmp_obj));
+
+	$this->locate($this->createLink('bug', 'browse', "productID=20", "html"));
+        //die(json_encode($bug));
     }
 }

@@ -142,7 +142,8 @@ class commonModel extends model
      */
     public function isOpenMethod($module, $method)
     {
-        if($module == 'user' and strpos('login|logout|deny|reset', $method) !== false) return true;
+	//ansen add plmlogin to openmethod, so bypass the privacy check.
+        if($module == 'user' and strpos('login|logout|deny|reset|plmlogin', $method) !== false) return true;
         if($module == 'api'  and $method == 'getsessionid') return true;
         if($module == 'misc' and $method == 'ping')  return true;
         if($module == 'misc' and $method == 'checktable') return true;

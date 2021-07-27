@@ -246,6 +246,75 @@ class product extends control
     }
 
     /**
+     * Create a product by PLM this is interface opened to PLM to create a product . 
+     * 
+     * @access public
+     * @return void
+     */
+    public function ajaxCreateByPlmTest()
+    {
+
+        header('Content-type: application/json');
+	$post_data = file_get_contents('php://input');
+	$tmp_obj = json_decode($post_data);
+        //$tmp_obj->code = "103";
+        //die($post_data);
+        //die(json_encode($tmp_obj));
+        if(!empty($tmp_obj->code) && !empty($tmp_obj->name))
+        {
+            $productID = $this->product->createByPlm($tmp_obj);
+            if(dao::isError()) die(js::error(dao::getError()));
+
+            $tmp_obj->code = $productID;
+            die(json_encode($tmp_obj));
+        }
+
+        $tmp_obj->code = "0";
+        die(json_encode($tmp_obj));
+    }
+
+    /**
+     * Create a product by PLM this is interface opened to PLM to create a product . 
+     * 
+     * @access public
+     * @return void
+     */
+    public function ajaxCreateByPlm()
+    {
+
+        header('Content-type: application/json');
+	$post_data = file_get_contents('php://input');
+	$tmp_obj = json_decode($post_data);
+        //$tmp_obj->code = "103";
+        //die($post_data);
+	//die(json_encode($tmp_obj));
+	$resp       = new stdclass();
+        $resp->ret      = 'success' ;
+        $resp->msgcode  = '00' ;
+        $resp->desc     = '' ;
+
+        if(!empty($tmp_obj->code) && !empty($tmp_obj->name))
+        {
+            $productID = $this->product->createByPlm($tmp_obj);
+	    if(dao::isError()) 
+	    {
+                $resp->ret  = "failed";
+                $resp->msgcode = "01";
+                $resp->desc = dao::getError();
+                die(json_encode($resp));
+            }
+            die(json_encode($resp));
+        }
+
+        $resp->ret  = "failed";
+        $resp->msgcode = "02";
+        $resp->desc = "name or code can not be empty";
+        die(json_encode($resp));
+    }
+
+
+
+    /**
      * Edit a product.
      * 
      * @param  int    $productID 

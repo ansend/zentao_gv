@@ -258,6 +258,23 @@ class productModel extends model
     }
 
     /**
+     * Get product pairs.
+     *
+     * @param  string $mode
+     * @return array
+     */
+    public function getIDbyCode($code = '')
+    {
+        $productID = $this->dao->select('id, name, code')
+            ->from(TABLE_PRODUCT)
+	    ->where('deleted')->eq(0)
+	    ->andWhere('code')->eq($code)
+	    ->fetch();
+        return $productID;
+    }
+
+
+    /**
      * Get products by project.
      *
      * @param  int    $projectID
@@ -329,6 +346,48 @@ class productModel extends model
 
         return $productID;
     }
+
+    /**
+     * Create a product by Plm system.
+     *
+     * @access public
+     * @return int
+     */
+    public function createByPlm($json_obj)
+    {
+
+        $data  = new stdclass();
+        $data->type             = 'normal' ;
+        $data->createdBy        = 'plm' ;
+        $data->createdDate      = helper::now();
+        $data->createdVersion   = $this->config->version;
+        $data->code             = $json_obj->code;
+        $data->name             = $json_obj->name;
+        $data->PO               = 'plm' ;
+        
+        $this->dao->insert(TABLE_PRODUCT)->data($data)->autoCheck()
+            ->batchCheck($this->config->product->create->requiredFields, 'notempty')
+            ->checkIF(strlen($product->code) == 0, 'code', 'notempty') //the value of product code can be 0 or 00.00
+            ->check('name', 'unique', "deleted = '0'")
+            ->check('code', 'unique', "deleted = '0'")
+            ->exec();
+
+        $productID = $this->dao->lastInsertID();
+        //$this->file->updateObjectID($this->post->uid, $productID, 'product');
+        $this->dao->update(TABLE_PRODUCT)->set('`order`')->eq($productID * 5)->where('id')->eq($productID)->exec();
+
+        /* Create doc lib. */
+        $this->app->loadLang('doc');
+        $lib = new stdclass();
+        $lib->product = $productID;
+        $lib->name    = $this->lang->doclib->main['product'];
+        $lib->main    = '1';
+        $lib->acl     = 'open';
+        $this->dao->insert(TABLE_DOCLIB)->data($lib)->exec();
+        return $productID;
+    }
+
+
 
     /**
      * Update a product.

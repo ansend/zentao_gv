@@ -86,6 +86,7 @@ $filter->testtask->default       = new stdclass();
 $filter->todo->export            = new stdclass();
 $filter->upgrade->license        = new stdclass();
 $filter->user->login             = new stdclass();
+$filter->user->plmlogin          = new stdclass();
 
 $filter->bug->batchcreate->cookie['preBranch'] = 'int';
 $filter->bug->browse->cookie['bugModule']      = 'int';
@@ -161,6 +162,7 @@ $filter->testtask->default->cookie['preProductID'] = 'int';
 $filter->todo->export->cookie['checkedItem'] = 'reg::checked';
 
 $filter->user->login->cookie['keepLogin'] = 'equal::on';
+$filter->user->plmlogin->cookie['keepLogin'] = 'equal::on';
 
 $filter->block->default->get['hash']    = 'reg::md5';
 $filter->block->main->get['blockid']    = 'code';
@@ -200,6 +202,12 @@ $filter->upgrade->license->get['agree'] = 'equal::true';
 $filter->user->login->get['account']  = 'account';
 $filter->user->login->get['lang']     = 'reg::lang';
 $filter->user->login->get['password'] = 'reg::any';
+$filter->user->plmlogin->get['account']  = 'account';
+$filter->user->plmlogin->get['lang']     = 'reg::lang';
+$filter->user->plmlogin->get['password'] = 'reg::any';
+$filter->user->plmlogin->get['productcode'] = 'reg::any';
+
+
 $filter->user->edit->get['from']      = 'reg::word';
 
 $filter->git->cat->get['repoUrl']  = 'reg::base64';
