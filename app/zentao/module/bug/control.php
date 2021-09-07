@@ -96,7 +96,12 @@ class bug extends control
 			  $productID = (int)$products_id->id;
 		       }
 		    }else{
-                      // echo(js::alert("no found product code"));
+                       // no product id found according to the product code.
+                       // echo(js::alert("no found product code"));
+                       echo(js::alert($this->lang->product->accessDenied));
+		       $loginLink = $this->config->requestType == 'GET' ? "?{$this->config->moduleVar}=user&{$this->config->methodVar}=login" : "user{$this->config->requestFix}login";
+		       if(strpos($this->server->http_referer, $loginLink) !== false) die(js::locate(inlink('index')));
+		       die(js::locate('back'));
 		    }
                 //}
 	}
@@ -1662,13 +1667,28 @@ class bug extends control
     }
 
     /**
-     * Ajax get bug by ID.
+    * Ajax get bug by ID.
+    *
+    * @param  int    $bugID
+    * @access public
+    * @return void
+    */
+    public function ajaxGetByID($bugID)
+    {
+        $bug = $this->dao->select('*')->from(TABLE_BUG)->where('id')->eq($bugID)->fetch();
+        $realname = $this->dao->select('*')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('realname');
+        $bug->assignedTo = $realname ? $realname : ($bug->assignedTo == 'closed' ? 'Closed' : $bug->assignedTo);
+        die(json_encode($bug));
+    }   
+
+    /**
+     * Ajax get bug by ID Test.
      *
      * @param  int    $bugID
      * @access public
      * @return void
      */
-    public function ajaxGetByID($bugID)
+    public function ajaxGetByIDTest($bugID)
     {
         $bug = $this->dao->select('*')->from(TABLE_BUG)->where('id')->eq($bugID)->fetch();
         $realname = $this->dao->select('*')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('realname');
